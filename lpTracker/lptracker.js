@@ -13,10 +13,10 @@ async function trackingLp(client, riotKey) {
     const interval = 10000; // Intervalle en millisecondes (10 secondes)
     const jsonData = await fs.readFile(filePathAccount, 'utf-8');
     const jsonObject = JSON.parse(jsonData);
+    console.log("vérification des dernières games jouées par les personnes inscrites");
 
         for (const [index, item] of jsonObject.entries()) {
             //item.id = summonner id;
-            console.log(item.gameName);
             const played = await getPlayerLastSoloDuo(riotKey,item.puuid,item.lastGameID);
             if(played){
                 await getPlayerRankAndLp(item.id,riotKey,item.lp,item.tier, item.rank);
@@ -28,6 +28,7 @@ async function trackingLp(client, riotKey) {
         }
 
         // Re-lancer après avoir traité tous les éléments relancer toutes les 10 mins (600000)
+        console.log("fin de la vérification");
         setTimeout(() => trackingLp(client, riotKey), 600000);}
 
 
@@ -90,6 +91,9 @@ async function getPlayerLastSoloDuo(riotKey, puuid,lastGameID){
         }else{
             const response = await axios.get(`https://europe.api.riotgames.com/lol/match/v5/matches/${GameID}?api_key=${riotKey}`);
             const matchDetails = response.data;
+            if(matchDetails.info.queueId !== 420){
+                return false;
+            }
             const playerStats = matchDetails.info.participants.find(participant => participant.puuid === puuid);
             m_data.kills = playerStats.kills;
             m_data.deaths = playerStats.deaths;

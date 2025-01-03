@@ -4,7 +4,6 @@ const  tokenDiscord = process.env.tokenDiscord;
 const  riotAPIKey  = process.env.riotAPIKey;
 const  clientId  = process.env.clientId;
 const  guildId  = process.env.guildId;
-console.log(guildId);
 
 const fs = require('node:fs');
 const path = require('node:path');

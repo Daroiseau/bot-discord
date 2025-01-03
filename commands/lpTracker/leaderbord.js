@@ -20,7 +20,6 @@ module.exports = {
             const jsonObject = JSON.parse(jsonData);
             await compare(jsonObject);
             await interaction.reply({embeds : [await createGameResultsEmbed()] })
-            //console.log(leaderboard);
         }catch(error){
             console.error("problème avec le leaderboard", error);
         }

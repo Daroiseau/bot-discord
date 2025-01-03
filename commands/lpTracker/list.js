@@ -13,7 +13,6 @@ module.exports = {
             const jsonData = await fs.readFile(filePath, 'utf-8');
             const jsonObject = JSON.parse(jsonData);
             await interaction.reply({embeds : [await createGameResultsEmbed(jsonObject)] })
-            //console.log(leaderboard);
         }catch(error){
             console.error("problème avec le leaderboard", error);
         }
