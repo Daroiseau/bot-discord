@@ -6,8 +6,7 @@ require(`dotenv`).config();
 const tokenDiscord  = process.env.tokenDiscord;
 const  riotAPIKey  = process.env.riotAPIKey;
 const  {trackingLp}  = require('./lpTracker/lptracker.js'); // Import du fichier secondaire
-const express = require('express'); //sert pour que le bot soit tjr actif grace a uptimebot
-const app = express();				//same
+
 
 
 
@@ -35,12 +34,6 @@ client.once(Events.ClientReady, readyClient => {
 	console.log(`Ready! Logged in as ${readyClient.user.tag}`);
 	//const interval = 6000; // Intervalle en millisecondes (par exemple, ici toutes les 6 secondes)
     trackingLp(client, riotAPIKey);
-	//sert pour que le bot soit tjr actif grace a uptimebot
-	app.get('/', (req, res) => {
-		res.send('Bot is running!');
-	});
-	const PORT = process.env.PORT || 3000;
-	app.listen(PORT, () => console.log(`Server is running on port ${PORT}`));
 });
 
 
