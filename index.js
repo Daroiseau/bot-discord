@@ -6,6 +6,10 @@ require(`dotenv`).config();
 const tokenDiscord  = process.env.tokenDiscord;
 const  riotAPIKey  = process.env.riotAPIKey;
 const  {trackingLp}  = require('./lpTracker/lptracker.js'); // Import du fichier secondaire
+const http = require('http');
+
+// Port par défaut fourni par Render
+const PORT = process.env.PORT || 3000;
 
 
 
@@ -33,6 +37,14 @@ for (const folder of commandFolders) {
 client.once(Events.ClientReady, readyClient => {
 	console.log(`Ready! Logged in as ${readyClient.user.tag}`);
 	//const interval = 6000; // Intervalle en millisecondes (par exemple, ici toutes les 6 secondes)
+
+
+	// Créer un serveur web minimal
+	http.createServer((req, res) => {
+		res.writeHead(200, { 'Content-Type': 'text/plain' });
+		res.end('Bot is running!');
+	}).listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
     trackingLp(client, riotAPIKey);
 });
 
