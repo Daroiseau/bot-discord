@@ -63,9 +63,9 @@ async function getPlayerRankAndLp(summonerId,riotKey, lastLp, lastTier, lastRank
                 if(!tierChanged && !rankChanged){
                     m_data.lp = m_data.lpGeneral-lastLp;
                 }else if(m_data.gameStatue ==="win"){
-                    m_data.lp = (100-m_data.lastLp)+m_data.lpGeneral;
+                    m_data.lp = (100-lastLp)+m_data.lpGeneral;
                 }else{
-                    m_data.lp = (100-m_data.lpGeneral)+m_data.lastLp;
+                    m_data.lp = (100-m_data.lpGeneral)+lastLp;
                 }
             }
             
