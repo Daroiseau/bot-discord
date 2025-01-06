@@ -24,8 +24,8 @@
     "profileIconId": 6760,
     "revisionDate": 1733594288000,
     "summonerLevel": 273,
-    "lastGameID": "EUW1_7253268412",
-    "lp": 48,
+    "lastGameID": "EUW1_7256713043",
+    "lp": 51,
     "rank": "IV",
     "tier": "BRONZE"
   },
@@ -54,8 +54,8 @@
     "profileIconId": 8,
     "revisionDate": 1734271724000,
     "summonerLevel": 109,
-    "lastGameID": "EUW1_7228681934",
-    "lp": 21,
+    "lastGameID": "EUW1_7255769143",
+    "lp": 46,
     "rank": "IV",
     "tier": "IRON"
   },
@@ -69,9 +69,9 @@
     "profileIconId": 6089,
     "revisionDate": 1735937744573,
     "summonerLevel": 522,
-    "lastGameID": "EUW1_7253694590",
-    "lp": 3,
-    "rank": "III",
+    "lastGameID": "EUW1_7256542707",
+    "lp": 73,
+    "rank": "IV",
     "tier": "PLATINUM"
   },
   {
@@ -84,9 +84,9 @@
     "profileIconId": 6680,
     "revisionDate": 1735928099764,
     "summonerLevel": 196,
-    "lastGameID": "EUW1_7252852940",
-    "lp": 94,
-    "rank": "IV",
+    "lastGameID": "EUW1_7256926287",
+    "lp": 9,
+    "rank": "II",
     "tier": "BRONZE"
   },
   {
@@ -103,5 +103,20 @@
     "lp": 26,
     "rank": "III",
     "tier": "BRONZE"
+  },
+  {
+    "discordName": "<@332448813857898499>",
+    "gameName": "BadAdcOnly",
+    "tag": "12345",
+    "puuid": "cF9ptGtIuMSlpA_4ImAaEyVCh_1JJeNzbhvNyIPOmud-dKJgyR3bA5mDHFUNB5KmrTJvtlt5qOQihA",
+    "id": "KzQRSgULaqjONVBR7iqxPSP6UYE8g-E7nN2ouaVVKPOujnfUJYKaO2apuQ",
+    "accountId": "ZZZvhbhb2x4Nyz4IN0HSyBxBEopevKA-k4jrooZsNLV9K4hc1WFUmvfT",
+    "profileIconId": 3542,
+    "revisionDate": 1732031200000,
+    "summonerLevel": 10,
+    "lastGameID": "",
+    "lp": "",
+    "rank": "",
+    "tier": ""
   }
 ]
