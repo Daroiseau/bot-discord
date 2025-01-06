@@ -28,14 +28,14 @@ async function syncToGithub(){
             (successCommit) => {
                 console.log(successCommit);
             }, (failed) => {
-                console.log('failed commmit');
+                console.log(failed,'failed commmit');
             });
     // Finally push to online repository
     await simpleGit.push('origin','master')
         .then((success) => {
             console.log('repo successfully pushed');
         },(failed)=> {
-            console.log('repo push failed');
+            console.log(failed,'repo push failed');
         });
 }
 
