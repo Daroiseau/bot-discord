@@ -7,6 +7,7 @@ const tokenDiscord  = process.env.tokenDiscord;
 const  riotAPIKey  = process.env.riotAPIKey;
 const  {trackingLp}  = require('./lpTracker/lptracker.js'); // Import du fichier secondaire
 const http = require('http');
+const { syncToGithub } = require('./syncToGithub.js');
 
 // Port par défaut fourni par Render
 const PORT = process.env.PORT || 3000;
