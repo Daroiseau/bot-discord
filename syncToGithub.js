@@ -31,7 +31,7 @@ async function syncToGithub(){
                 console.log(failed,'failed commmit');
             });
     // Finally push to online repository
-    await simpleGit.push('origin','master')
+    await simpleGit.push('origin','bot commit')
         .then((success) => {
             console.log('repo successfully pushed');
         },(failed)=> {
