@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require('discord.js');
 const path = require('path');
-const filePath = path.resolve(__dirname, '../../informations/AccountDiscordToLol.json');
+const filePath = path.resolve(__dirname, '../../informations/AccountDiscordToLOl.json');
 const fs = require('fs').promises; // Utilisation de fs.promises pour les opérations asynchrones
 const {EmbedBuilder } = require('discord.js');
 
