@@ -3,6 +3,7 @@ const axios = require('axios');
 require(`dotenv`).config();
 const  riotAPIKey  = process.env.riotAPIKey;
 const path = require('path');
+const { syncToGithub } = require('../../syncToGithub');
 const ecriture = path.resolve(__dirname, '../../informations/AccountDiscordtoLOl.json');
 const fs = require('fs').promises; // Utilisation de fs.promises pour les opérations asynchrones
 const m_data = {discordName : '', gameName :'', tag :'', puuid : '', id :'', accountId : '', profileIconId : '', revisionDate : '', summonerLevel :'', lastGameID : '', lp :'', rank:'', tier :''};
@@ -148,6 +149,7 @@ async function writeJSON(filePath, data) {
             // Réécrire le fichier avec les nouvelles données
             await fs.writeFile(filePath, jsonData);
             console.log(`Données ajoutées au fichier ${filePath}`);
+            syncToGithub();
             return true;
         } else {
             console.log('Les données existent déjà dans le fichier. Aucune modification effectuée.');
