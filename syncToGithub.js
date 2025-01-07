@@ -25,7 +25,7 @@ async function syncToGithub(){
             console.log(failedAdd,'adding files failed');
       });
    // Commit files as Initial Commit
-   await simpleGit.commit('Intial commit by simplegit')
+   await simpleGit.commit('commit by Pablo')
       .then(
          (successCommit) => {
          console.log(successCommit);
