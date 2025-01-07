@@ -15,7 +15,7 @@ async function syncToGithub(){
    
 
    // Add remore repo url as origin to repo
-   simpleGit.addRemote('set-url',origin',githubUrl);
+   simpleGit.addRemote('set-url','origin',githubUrl);
    // Add all files for commit
    await simpleGit.add('.')
       .then(
