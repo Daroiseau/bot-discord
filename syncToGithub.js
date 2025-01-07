@@ -10,7 +10,7 @@ async function syncToGithub(){
     const githubUrl = `https://${userName}:${password}@github.com/${userName}/${repo}`;
 
    
-   await simpleGit.addConfig('user.name','Daroiseau');
+   await simpleGit.addConfig('user.name','Pablo');
    await simpleGit.addConfig('user.email','tanguymonguillon@gmail.com');
    
 
