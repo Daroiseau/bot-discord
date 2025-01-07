@@ -53,10 +53,10 @@ async function reWriteJSON(filePath, pseudo, tag) {
 
             // Réécrire le fichier avec les nouvelles données
             await fs.writeFile(filePath, jsonData);
-            console.log(`Données ajoutées au fichier ${filePath}`);
+            console.log(`Données supprimé du fichier ${filePath}`);
             return true;
         } else {
-            console.log('Les données existent déjà dans le fichier. Aucune modification effectuée.');
+            console.log('Les données n existent pas dans le fichier. Aucune modification effectuée.');
             return false;
         }
     } catch (error) {
