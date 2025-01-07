@@ -62,6 +62,7 @@ async function getPlayerRankAndLp(summonerId,riotKey, lastLp, lastTier, lastRank
             const lpDefined = (lastLp !== undefined && m_data.lpGeneral !== undefined);
             if(lpDefined){
                 if(!tierChanged && !rankChanged){
+                    m_data.gamePromotion = "no";
                     m_data.lp = m_data.lpGeneral-lastLp;
                     m_data.promotion = "no";
                 }else if(m_data.gameStatue ==="win"){

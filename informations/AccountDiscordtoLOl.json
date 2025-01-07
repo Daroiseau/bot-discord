@@ -118,5 +118,35 @@
     "lp": "",
     "rank": "",
     "tier": ""
+  },
+  {
+    "discordName": "<@332448813857898499>",
+    "gameName": "OsamaJhinLaden4",
+    "tag": "JHIN",
+    "puuid": "jqqeOQPCAPPhSG3x006QU74u5T-JOQO2yC3An1HhLhPRBXLy9_DQl9H1I7f5wlUOb8c_OiCcJQKKiA",
+    "id": "oAOCRNMZhwEDXgwJ3x-78v9lDUMlhAvrwkJGdA1BDzpDyN2obZ4Sya-fBQ",
+    "accountId": "urZfMuf5IZXEXZz6qfFQtfOUYobsXieOdRPYdW0tHDadgK2yv-NDEI0G",
+    "profileIconId": 29,
+    "revisionDate": 1732112504000,
+    "summonerLevel": 13,
+    "lastGameID": "",
+    "lp": "",
+    "rank": "",
+    "tier": ""
+  },
+  {
+    "discordName": "<@332448813857898499>",
+    "gameName": "BadAdcOnly",
+    "tag": "12345",
+    "puuid": "cF9ptGtIuMSlpA_4ImAaEyVCh_1JJeNzbhvNyIPOmud-dKJgyR3bA5mDHFUNB5KmrTJvtlt5qOQihA",
+    "id": "KzQRSgULaqjONVBR7iqxPSP6UYE8g-E7nN2ouaVVKPOujnfUJYKaO2apuQ",
+    "accountId": "ZZZvhbhb2x4Nyz4IN0HSyBxBEopevKA-k4jrooZsNLV9K4hc1WFUmvfT",
+    "profileIconId": 3542,
+    "revisionDate": 1732031200000,
+    "summonerLevel": 10,
+    "lastGameID": "",
+    "lp": "",
+    "rank": "",
+    "tier": ""
   }
 ]
