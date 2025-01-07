@@ -9,8 +9,10 @@ async function syncToGithub(){
     const repo = 'bot-discord';
     const githubUrl = `https://${userName}:${password}@github.com/${userName}/${repo}`;
 
-   simpleGit.addConfig('user.email','tanguymonguillon@gmail.com');
-   simpleGit.addConfig('user.name','Daroiseau');
+   
+   await simpleGit.addConfig('user.name','Daroiseau');
+   await simpleGit.addConfig('user.email','tanguymonguillon@gmail.com');
+   
 
    // Add remore repo url as origin to repo
    simpleGit.addRemote('origin',githubUrl);
