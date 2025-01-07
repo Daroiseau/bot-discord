@@ -7,7 +7,7 @@ const axios = require('axios');
 
 
 //tableau avec toutes les valeurs que j'ai besoins pour le message 
-const m_data = {pseudo :'', gameStatue :'', lp : '', lpGeneral :'', tier :'', rank :'', color :'', kills :'', deaths :'', assists :'', champion :'', queue :'', wins :'', losses :'', gameID :'', win :""};
+const m_data = {pseudo :'', gameStatue :'', lp : '', lpGeneral :'', tier :'', rank :'', color :'', kills :'', deaths :'', assists :'', champion :'', queue :'', wins :'', losses :'', gameID :'', win :"", gamePromotion:""};
 
 async function trackingLp(client, riotKey) {
     const interval = 10000; // Intervalle en millisecondes (10 secondes)
@@ -61,10 +61,13 @@ async function getPlayerRankAndLp(summonerId,riotKey, lastLp, lastTier, lastRank
             const lpDefined = (lastLp !== undefined && m_data.lpGeneral !== undefined);
             if(lpDefined){
                 if(!tierChanged && !rankChanged){
+                    m_data.gamePromotion = "no";
                     m_data.lp = m_data.lpGeneral-lastLp;
                 }else if(m_data.gameStatue ==="win"){
+                    m_data.gamePromotion = "up";
                     m_data.lp = (100-lastLp)+m_data.lpGeneral;
                 }else{
+                    m_data.gamePromotion = "down";
                     m_data.lp = (100-m_data.lpGeneral)+lastLp;
                 }
             }
@@ -126,7 +129,9 @@ function createGameResultsEmbed(m_data){
         iconURL: 'https://cdn.discordapp.com/attachments/1220074375093420142/1316399558108123177/ppDiscord.png?ex=675ae820&is=675996a0&hm=52a4de52b8f8e2cec96a0c6712b251cf121b67ed31f38f9a9af61108cd40d42f&',
     })
     .setTitle(m_data.gameStatue === "win" ? 'Victory' : 'Defeat')
-    .setDescription(`${m_data.pseudo} a ${m_data.gameStatue} ${m_data.lp} league points et arrive ${m_data.tier} ${m_data.rank} ${m_data.lpGeneral}  lp`)
+    .setDescription(m_data.gamePromotion ==="up" ? `${m_data.pseudo} a ${m_data.gameStatue} ${m_data.lp} league points et est promu ${m_data.tier} ${m_data.rank} ${m_data.lpGeneral}  lp`
+                    : m_data.gamePromotion ==="down" ? `${m_data.pseudo} a ${m_data.gameStatue} ${m_data.lp} league points et est délégué ${m_data.tier} ${m_data.rank} ${m_data.lpGeneral}  lp`
+                    :`${m_data.pseudo} a ${m_data.gameStatue} ${m_data.lp} league points et arrive ${m_data.tier} ${m_data.rank} ${m_data.lpGeneral}  lp`)
     .setColor(m_data.color || '#ffffff') // Couleur de l'embed
     .setThumbnail(`https://ddragon.leagueoflegends.com/cdn/14.23.1/img/champion/${m_data.champion}.png`)
     // Ajouter des champs (fields)
