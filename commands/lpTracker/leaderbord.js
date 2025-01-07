@@ -1,8 +1,6 @@
 const { SlashCommandBuilder } = require('discord.js');
-const path = require('path');
-const filePath = path.resolve(__dirname, '../../informations/AccountDiscordtoLOl.json');
-const fs = require('fs').promises; // Utilisation de fs.promises pour les opérations asynchrones
 const {EmbedBuilder } = require('discord.js');
+const { getData } = require('../../database/bddFunction');
 
 const rankList = ["IV","III","II","I"];
 const tierList = ["IRON","BRONZE","SILVER","GOLD","PLATINUM","DIAMOND","MASTER","GRANDMASTER","CHALLENGER"];
@@ -16,9 +14,8 @@ module.exports = {
         .setDescription('Permet d\'afficher le leaderboard des parties classés des personnes enregistré'),
     async execute(interaction) {
         try {
-            const jsonData = await fs.readFile(filePath, 'utf-8');
-            const jsonObject = JSON.parse(jsonData);
-            await compare(jsonObject);
+            const data = await getData('enregistredpersons');
+            await compare(data);
             await interaction.reply({embeds : [await createGameResultsEmbed()] })
         }catch(error){
             console.error("problème avec le leaderboard", error);
@@ -26,10 +23,10 @@ module.exports = {
     }
 };
 
-async function compare(jsonObject){
-    for (const [index, item] of jsonObject.entries()) {
+async function compare(data){
+    for (const item of data) {
         const point = `${tierList.indexOf(item.tier)}`+`${rankList.indexOf(item.rank)}`;
-        leaderboard.push({name : item.gameName,point : point, tier : item.tier, rank :item.rank, lp : item.lp });
+        leaderboard.push({name : item.gamename,point : point, tier : item.tier, rank :item.rank, lp : item.lp });
     }
     leaderboard.sort((a, b) =>  b.point - a.point);
     leaderboard.splice(0,1);

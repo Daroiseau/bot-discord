@@ -1,7 +1,5 @@
 const { SlashCommandBuilder } = require('discord.js');
-const path = require('path');
-const filePath = path.resolve(__dirname, '../../informations/lpTrackerChannel.json');
-const fs = require('fs').promises; // Utilisation de fs.promises pour les opérations asynchrones
+const { updateData } = require('../../database/bddFunction');
 
 
 
@@ -18,12 +16,15 @@ module.exports = {
     async execute(interaction) {
         const channelName = interaction.options.getAny('rankchannel');
         try {
-            await fs.writeFile(filePath, channelName);
-            await interaction.reply('Channel ajouté avec succès.');
+            const res = await updateData('lptrackerchannel',{idchannel : channelName}, {id : 1});
+            if(res != 0){
+                await interaction.reply('Channel ajouté avec succès.');
+            }else{
+                await interaction.reply(`Problème avec l'initialisation du channel`);
+            }
         }catch{
-            console.error(`Erreur d'écriture dans le fichier ${filePath}:`, error);
+            console.error(`Erreur dans lpTrackerChannel:`, error);
             throw error; // Rejette l'erreur pour pouvoir la gérer dans l'exécution de la commande
-            await interaction.reply(`Problème avec l'initialisation du channel`);
 
         }
     }

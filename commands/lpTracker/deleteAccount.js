@@ -1,8 +1,5 @@
 const { SlashCommandBuilder } = require('discord.js');
-const path = require('path');
-const filePath = path.resolve(__dirname, '../../informations/AccountDiscordtoLOl.json');
-const fs = require('fs').promises; // Utilisation de fs.promises pour les opérations asynchrones
-const {EmbedBuilder } = require('discord.js');
+const { deleteData } = require('../../database/bddFunction');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -18,49 +15,17 @@ module.exports = {
                 .setRequired(true)
         ),
     async execute(interaction) {
-        try {
-            const pseudo = interaction.options.getString('pseudo');
-            const tag = interaction.options.getString('tag');
-            if(await reWriteJSON(filePath, pseudo, tag)){
+        const pseudo = interaction.options.getString('pseudo');
+        const tag = interaction.options.getString('tag');
+        try{
+            const res = await deleteData('enregistredpersons',{gameName : pseudo, tag : tag});
+            if(res != 0){
                 await interaction.reply("Le compte a bien été supprimé");
             }else{
                 await interaction.reply("Le compte n'as pas pu être supprimé, il n'existe pas");
             }
-        }catch(error){
-            console.error("problème avec le leaderboard", error);
+        }catch(err){
+            console.error('Error in deleteaccount : ',err);
         }
     }
 };
-
-async function reWriteJSON(filePath, pseudo, tag) {
-    try {
-        let existingData = [];
-
-        //lire son contenu
-        const fileContent = await fs.readFile(filePath, 'utf-8');
-        existingData = JSON.parse(fileContent); // Parse le contenu JSON existant
-
-        // Vérifier si les données existent déjà dans le fichier
-        const isDataExists = existingData.some(item => item.gameName === pseudo) && existingData.some(item => item.tag === tag);
-        
-        if (isDataExists) {
-            // Ajouter les nouvelles données si elles n'existent pas déjà
-            const index = existingData.findIndex(personne => personne.gameName === pseudo && personne.tag === tag );
-            existingData.splice(index,1);
-
-            // Convertir les données combinées en chaîne JSON
-            const jsonData = JSON.stringify(existingData, null, 2);
-
-            // Réécrire le fichier avec les nouvelles données
-            await fs.writeFile(filePath, jsonData);
-            console.log(`Données supprimé du fichier ${filePath}`);
-            return true;
-        } else {
-            console.log('Les données n existent pas dans le fichier. Aucune modification effectuée.');
-            return false;
-        }
-    } catch (error) {
-        console.error(`Erreur d'écriture dans le fichier ${filePath}:`, error);
-        throw error; // Rejette l'erreur pour pouvoir la gérer dans l'exécution de la commande
-    }
-}

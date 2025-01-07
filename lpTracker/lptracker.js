@@ -1,9 +1,6 @@
-const path = require('path');
-const filePathChannel = path.resolve(__dirname, '../informations/lpTrackerChannel.json');
-const filePathAccount = path.resolve(__dirname, '../informations/AccountDiscordtoLOl.json');
-const fs = require('fs').promises; // Utilisation de fs.promises pour les opérations asynchrones
 const {EmbedBuilder } = require('discord.js');
 const axios = require('axios');
+const { getData, updateData } = require('../database/bddFunction');
 
 
 //tableau avec toutes les valeurs que j'ai besoins pour le message 
@@ -11,15 +8,16 @@ const m_data = {pseudo :'', gameStatue :'', lp : '', lpGeneral :'', tier :'', ra
 
 async function trackingLp(client, riotKey) {
     const interval = 10000; // Intervalle en millisecondes (10 secondes)
-    const jsonData = await fs.readFile(filePathAccount, 'utf-8');
-    const jsonObject = JSON.parse(jsonData);
+    const Data = await getData('enregistredpersons');
+    //const jsonObject = JSON.parse(jsonData);
     console.log("vérification des dernières games jouées par les personnes inscrites");
 
-        for (const [index, item] of jsonObject.entries()) {
+        for (const item of Data) {
+
             //item.id = summonner id;
-            const played = await getPlayerLastSoloDuo(riotKey,item.puuid,item.lastGameID);
+            const played = await getPlayerLastSoloDuo(riotKey,item.puuid,item.lastgameid);
             if(played){
-                m_data.pseudo = item.gameName + '#'+ item.tag;
+                m_data.pseudo = item.gamename + '#'+ item.tag;
                 await getPlayerRankAndLp(item.id,riotKey,item.lp,item.tier, item.rank);
                 await updateLastGameID(item.puuid, m_data.gameID, m_data.lpGeneral, m_data.rank, m_data.tier);
                 
@@ -62,7 +60,6 @@ async function getPlayerRankAndLp(summonerId,riotKey, lastLp, lastTier, lastRank
             const lpDefined = (lastLp !== undefined && m_data.lpGeneral !== undefined);
             if(lpDefined){
                 if(!tierChanged && !rankChanged){
-                    m_data.gamePromotion = "no";
                     m_data.lp = m_data.lpGeneral-lastLp;
                     m_data.promotion = "no";
                 }else if(m_data.gameStatue ==="win"){
@@ -118,9 +115,9 @@ async function getPlayerLastSoloDuo(riotKey, puuid,lastGameID){
 }
 
 //permet de savoir le channel ou le bot va devoir écrire les messages 
-async function getChannelForWriting(filepath){
-    let data = await fs.readFile(filepath, 'utf-8');
-    return data.trim();
+async function getChannelForWriting(){
+    let data = await getData('lptrackerchannel', {id : 1});
+    return data[0].idchannel;
 }
 
 //mise en forme du message 
@@ -161,7 +158,7 @@ function createGameResultsEmbed(m_data){
 // Fonction pour envoyer un message programmé
 async function scheduleMessage(client) {
         try {
-            const channelId = await getChannelForWriting(filePathChannel);
+            const channelId = await getChannelForWriting();
             const channel = await client.channels.fetch(channelId);
             if (channel /*&& channel.isTextBased()*/) {
                 await channel.send({embeds : [createGameResultsEmbed(m_data)] });
@@ -179,28 +176,9 @@ function sleep(ms) {
 
 async function updateLastGameID(puuid, newGameID, newLp, newRank, newTier) {
     try {
-        // Lire le fichier JSON
-        const jsonData = await fs.readFile(filePathAccount, 'utf-8');
-        const jsonObject = JSON.parse(jsonData);
-
-        // Trouver le joueur correspondant
-        const player = jsonObject.find(player => player.puuid === puuid);
-        if (!player) {
-            console.error(`Joueur avec discordName ${puuid} introuvable.`);
-            return;
-        }
-
-        // Mettre à jour le lastGameID
-        player.lastGameID = newGameID;
-        player.lp = newLp;
-        player.rank = newRank;
-        player.tier = newTier;
-        
-
-        // Réécrire le fichier avec les données mises à jour
-        await fs.writeFile(filePathAccount, JSON.stringify(jsonObject, null, 2), 'utf-8');
+        await updateData('enregistredpersons', {lastgameid : newGameID, lp : newLp, rank : newRank, tier : newTier}, {puuid : puuid})
     } catch (error) {
-        console.error('Erreur lors de la mise à jour du fichier JSON :', error.message);
+        console.error('Erreur dans updateLastGameId : ', error);
     }
 }
 

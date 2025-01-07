@@ -2,10 +2,8 @@ const { SlashCommandBuilder } = require('discord.js');
 const axios = require('axios');
 require(`dotenv`).config();
 const  riotAPIKey  = process.env.riotAPIKey;
-const path = require('path');
-const ecriture = path.resolve(__dirname, '../../informations/AccountDiscordtoLOl.json');
-const fs = require('fs').promises; // Utilisation de fs.promises pour les opérations asynchrones
-const m_data = {discordName : '', gameName :'', tag :'', puuid : '', id :'', accountId : '', profileIconId : '', revisionDate : '', summonerLevel :'', lastGameID : '', lp :'', rank:'', tier :''};
+const { insertData } = require('../../database/bddFunction');
+const m_data = {discordname : '', gamename :'', tag :'', puuid : '', id :'', accountid : '', profileiconid : '', revisiondate : '', summonerlevel :'', lastgameid : '', lp :'', rank:'', tier :''};
 
 
 module.exports = {
@@ -30,35 +28,35 @@ module.exports = {
     async execute(interaction) {
         const summonerName = interaction.options.getString('playername');
         const summonerTag = interaction.options.getString('tag');
-        m_data.discordName = interaction.options.getString('discordaccount');
+        m_data.discordname = interaction.options.getString('discordaccount');
         const summonerInfo = await getSummonerInfo(summonerName, summonerTag);
 
         if (summonerInfo) {
-            m_data.gameName = summonerInfo.gameName;
+            m_data.gamename = summonerInfo.gameName;
             m_data.tag = summonerInfo.tagLine;
             m_data.puuid = summonerInfo.puuid;
             const summonerOtherInfo = await getOtherSummonerInfo(m_data.puuid);
 
             if(summonerOtherInfo){
                 m_data.id = summonerOtherInfo.id;
-                m_data.accountId = summonerOtherInfo.accountId;
-                m_data.profileIconId = summonerOtherInfo.profileIconId;
-                m_data.revisionDate = summonerOtherInfo.revisionDate;
-                m_data.summonerLevel = summonerOtherInfo.summonerLevel;
-                await getPlayerRankAndLp(m_data.id,riotAPIKey);
-                await getLastGameID(m_data.puuid,riotAPIKey);
+                m_data.accountid = summonerOtherInfo.accountId;
+                m_data.profileiconid = summonerOtherInfo.profileIconId;
+                m_data.revisiondate = summonerOtherInfo.revisionDate;
+                m_data.summonerlevel = summonerOtherInfo.summonerLevel;
+                await getPlayerRankAndLp(m_data.id);
+                await getLastGameID(m_data.puuid);
                 try {
                     // Sauvegarde des données dans un fichier JSON
-                    const ajout = await writeJSON(ecriture, m_data);
-                    if(ajout){
+                    const res = await insertData('enregistredpersons',m_data);
+                    if(res !== undefined){
                         await interaction.reply('Compte discord et lol bien associés.');
                     }else{
                         await interaction.reply('Compte discord et lol déjà associés.');
                     }
                     
                 } catch (error) {
-                    console.error('Erreur lors de l\'écriture dans le fichier JSON:', error);
-                    await interaction.reply('Erreur lors de l\'enregistrement des données.');
+                    console.error('Erreur dans registerDiscordLol:', error);
+                    await interaction.reply('Compte discord et lol déjà associés');
                 }
             }
         } else {
@@ -88,7 +86,7 @@ async function getOtherSummonerInfo(puuid) {
     }
 }
 
-async function getPlayerRankAndLp(summonerId,riotKey) {
+async function getPlayerRankAndLp(summonerId) {
     
     try {
         const url = `https://euw1.api.riotgames.com/lol/league/v4/entries/by-summoner/${summonerId}?api_key=${riotAPIKey}`;
@@ -108,64 +106,17 @@ async function getPlayerRankAndLp(summonerId,riotKey) {
     }
 }
 
-async function getLastGameID(puuid, riotKey){
+async function getLastGameID(puuid){
     try {
         const responses = await axios.get(`https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/${puuid}/ids?type=ranked&start=0&count=1&api_key=${riotAPIKey}`);
         const gameIDs = responses.data;
         if(!Array.isArray(gameIDs) || !(gameIDs.length > 0)){
-            m_data.lastGameID = "";
+            m_data.lastgameid = "";
             return;
         }
-        m_data.lastGameID = gameIDs[0];
+        m_data.lastgameid = gameIDs[0];
     }catch(error){
         console.error('Erreur lors de la récupération des données :', error.message);
-    }
-}
-
-
-// Fonction d'écriture dans un fichier JSON
-async function writeJSON(filePath, data) {
-    try {
-        let existingData = [];
-
-        // Vérifier si le fichier existe déjà et lire son contenu
-        const fileExists = await fileExistsCheck(filePath);
-        if (fileExists) {
-            const fileContent = await fs.readFile(filePath, 'utf-8');
-            existingData = JSON.parse(fileContent); // Parse le contenu JSON existant
-        }
-
-        // Vérifier si les données existent déjà dans le fichier
-        const isDataExists = existingData.some(item => item.puuid === data.puuid);
-        
-        if (!isDataExists) {
-            // Ajouter les nouvelles données si elles n'existent pas déjà
-            existingData.push(data);
-
-            // Convertir les données combinées en chaîne JSON
-            const jsonData = JSON.stringify(existingData, null, 2);
-
-            // Réécrire le fichier avec les nouvelles données
-            await fs.writeFile(filePath, jsonData);
-            console.log(`Données ajoutées au fichier ${filePath}`);
-            return true;
-        } else {
-            console.log('Les données existent déjà dans le fichier. Aucune modification effectuée.');
-            return false;
-        }
-    } catch (error) {
-        console.error(`Erreur d'écriture dans le fichier ${filePath}:`, error);
-        throw error; // Rejette l'erreur pour pouvoir la gérer dans l'exécution de la commande
-    }
-}
-
-// Vérification de l'existence du fichier
-async function fileExistsCheck(filePath) {
-    try {
-        await fs.access(filePath);
-        return true; // Le fichier existe
-    } catch (error) {
-        return false; // Le fichier n'existe pas
     }
 }
 
