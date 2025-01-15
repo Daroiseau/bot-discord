@@ -9,7 +9,6 @@ const m_data = {pseudo :'', gameStatue :'', lp : '', lpGeneral :'', tier :'', ra
 async function trackingLp(client, riotKey) {
     const interval = 10000; // Intervalle en millisecondes (10 secondes)
     const Data = await getData('enregistredpersons');
-    //const jsonObject = JSON.parse(jsonData);
     console.log("vérification des dernières games jouées par les personnes inscrites");
 
         for (const item of Data) {
@@ -117,7 +116,7 @@ async function getPlayerLastSoloDuo(riotKey, puuid,lastGameID){
 //permet de savoir le channel ou le bot va devoir écrire les messages 
 async function getChannelForWriting(){
     let data = await getData('lptrackerchannel', {id : 1});
-    return data[0].idchannel;
+    return Number(data[0].idchannel);
 }
 
 //mise en forme du message 
