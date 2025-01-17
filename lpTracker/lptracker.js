@@ -1,6 +1,7 @@
 const {EmbedBuilder } = require('discord.js');
 const axios = require('axios');
 const { getData, updateData } = require('../database/bddFunction');
+const channelId = process.env.channelid;
 
 
 //tableau avec toutes les valeurs que j'ai besoins pour le message 
@@ -157,7 +158,7 @@ function createGameResultsEmbed(m_data){
 // Fonction pour envoyer un message programmé
 async function scheduleMessage(client) {
         try {
-            const channelId = await getChannelForWriting();
+            //const channelId = await getChannelForWriting();
             const channel = await client.channels.fetch(channelId);
             if (channel /*&& channel.isTextBased()*/) {
                 await channel.send({embeds : [createGameResultsEmbed(m_data)] });
