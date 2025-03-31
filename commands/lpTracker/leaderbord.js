@@ -4,7 +4,7 @@ const { getData } = require('../../database/bddFunction');
 
 const rankList = ["IV","III","II","I"];
 const tierList = ["IRON","BRONZE","SILVER","GOLD","PLATINUM","DIAMOND","MASTER","GRANDMASTER","CHALLENGER"];
-const leaderboard = [{}];
+
 
 
 
@@ -15,8 +15,10 @@ module.exports = {
     async execute(interaction) {
         try {
             const data = await getData('enregistredpersons');
-            await compare(data);
-            await interaction.reply({embeds : [await createGameResultsEmbed()] })
+            const leaderbord = await compare(data);
+            console.log(data);
+            await interaction.reply({embeds : [await createGameResultsEmbed(leaderbord)] })
+
         }catch(error){
             console.error("problème avec le leaderboard", error);
         }
@@ -24,15 +26,17 @@ module.exports = {
 };
 
 async function compare(data){
+    const leaderboard = [{}];
     for (const item of data) {
         const point = `${tierList.indexOf(item.tier)}`+`${rankList.indexOf(item.rank)}`;
         leaderboard.push({name : item.gamename,point : point, tier : item.tier, rank :item.rank, lp : item.lp });
     }
     leaderboard.sort((a, b) =>  b.point - a.point);
     leaderboard.splice(0,1);
+    return leaderboard;
 }
 
-async function createGameResultsEmbed(){
+async function createGameResultsEmbed(leaderboard){
     const embed = new EmbedBuilder()
     .setAuthor({
         name : `Leaderboard Solo/Duo queue`,
