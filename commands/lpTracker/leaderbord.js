@@ -2,8 +2,8 @@ const { SlashCommandBuilder } = require('discord.js');
 const {EmbedBuilder } = require('discord.js');
 const { getData } = require('../../database/bddFunction');
 
-const rankList = ["IV","III","II","I"];
-const tierList = ["IRON","BRONZE","SILVER","GOLD","PLATINUM","DIAMOND","MASTER","GRANDMASTER","CHALLENGER"];
+const rankList = ["","IV","III","II","I"];
+const tierList = ["UNRANKED","IRON","BRONZE","SILVER","GOLD","PLATINUM","DIAMOND","MASTER","GRANDMASTER","CHALLENGER"];
 
 
 
@@ -16,7 +16,6 @@ module.exports = {
         try {
             const data = await getData('enregistredpersons');
             const leaderbord = await compare(data);
-            console.log(data);
             await interaction.reply({embeds : [await createGameResultsEmbed(leaderbord)] })
 
         }catch(error){

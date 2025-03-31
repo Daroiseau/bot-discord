@@ -100,6 +100,10 @@ async function getPlayerRankAndLp(summonerId) {
             m_data.lp = soloQueue.leaguePoints;
             m_data.rank = soloQueue.rank;
             m_data.tier = soloQueue.tier;           
+        }else{
+            m_data.lp = null;
+            m_data.rank = "";
+            m_data.tier = "UNRANKED";
         }
     } catch (error) {
         console.error('Erreur lors de la récupération des données :', error.message);
