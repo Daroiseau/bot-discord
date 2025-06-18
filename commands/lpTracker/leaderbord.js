@@ -13,8 +13,9 @@ export default {
         .setDescription('Permet d\'afficher le leaderboard des parties classés des personnes enregistré'),
     async execute(interaction) {
         try {
-            const data = await getData('lol_accounts');
-            const leaderbord = await compare(data);
+            const accounts = await getData('lol_accounts');
+            const users = await getData('discord_users');
+            const leaderbord = await compare(accounts, users);
             await interaction.reply({embeds : [await createGameResultsEmbed(leaderbord)] })
 
         }catch(error){
@@ -27,29 +28,33 @@ export default {
     }
 };
 
-async function compare(data){
+async function compare(accounts, users) {
     const leaderboard = [];
-    for (const item of data) {
+    for (const item of accounts) {
         const tierIndex = tierList.indexOf(item.tier);
         const rankIndex = rankList.indexOf(item.rank);
         if (tierIndex === -1 || rankIndex === -1) {
             console.error(`Invalid tier or rank for player ${item.gamename}: tier=${item.tier}, rank=${item.rank}`);
             continue; // Skip this item if tier or rank is invalid
         }
+        //Trouver le pseudo discord associé
+        const user = users.find(u => u.id === item.discord_user_id);
+        const discordName = user ? user.discord_name : 'Unknown User';
         // Calculate the point based on tier and rank
         // Assuming the point is calculated as tier * 4 + rank, where tier is from 0 to 9 and rank is from 0 to 4
         // Example: UNRANKED = 0, IRON IV = 1, IRON III = 2, ..., CHALLENGER I = 36
         const point = (tierIndex * 4) + rankIndex;
         // Add the player to the leaderboard with their calculated points`;
         leaderboard.push({
-            name : item.gamename,
+            name : item.game_name,
+            discord: discordName,
             point : point,
             tier : item.tier,
             rank : item.rank,
             lp : item.lp
         });
     }
-    leaderboard.sort((a, b) =>  b.point - a.point); // Sort the leaderboard in descending order based on points
+    leaderboard.sort((a, b) =>  b.point - a.point || b.lp - a.lp); // Sort the leaderboard in descending order based on points
     return leaderboard;
 }
 

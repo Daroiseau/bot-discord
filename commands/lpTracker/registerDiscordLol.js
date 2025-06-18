@@ -2,7 +2,7 @@ import { SlashCommandBuilder } from 'discord.js';
 import axios from 'axios';
 import dotenv from 'dotenv';
 dotenv.config();
-import { insertData } from '../../database/bddFunction.js';
+import { insertData, getData } from '../../database/bddFunction.js';
 const  riotAPIKey  = process.env.riotAPIKey;
 const m_data = {
     discordname : '', 
@@ -43,12 +43,25 @@ export default {
     async execute(interaction) {
         const summonerName = interaction.options.getString('playername');
         const summonerTag = interaction.options.getString('tag');
-        m_data.discordname = interaction.options.getString('discordaccount');
+        const discordId = interaction.user.id;
+        const discordName = interaction.user.username;
 
         try {
             // Vérification si le pseudo discord est valide
-            const summonerInfo = await getSummonerInfo(summonerName, summonerTag);
+            // 1 Vérifier ou insérer l'utilisateur discord 
+            let users = await getData('discord_users', { discord_id: discord_id });
+            let discordUserId;
+            if(users.length === 0) {
+                await insertData('discord_users', { 
+                    discord_id: discordId, 
+                    discord_name: discordName 
+                });
+                users = await getData('discord_users', { discord_id: discord_id });
+            }
+            discordUserId = users[0].id;
 
+            // 2 Récupérer les infos lol 
+            const summonerInfo = await getSummonerInfo(summonerName, summonerTag);
             if (!summonerInfo) {
                 await interaction.reply('Impossible de trouver ce joueur.');
                 return;
@@ -74,7 +87,23 @@ export default {
             await getPlayerRankAndLp(m_data.id);
             await getLastGameID(m_data.puuid);
 
-            const res = await insertData('enregistredpersons', m_data);
+            //3 Insérer dans lol_accounts avec la clé étrangère discord_user_id
+            const lolAccount = {
+                discord_user_id: discordUserId,
+                game_name: m_data.gamename,
+                tag: m_data.tag,
+                puuid: m_data.puuid,
+                summoner_id: m_data.id,
+                account_id: m_data.accountid,
+                profile_icon_id: m_data.profileiconid,
+                summoner_level: m_data.summonerlevel,
+                last_game_id: m_data.lastgameid,
+                lp: m_data.lp,
+                rank: m_data.rank,
+                tier: m_data.tier
+            };
+
+            const res = await insertData('lol_accounts', lolAccount);
             
             if (res > 0) {
                 await interaction.reply('Compte discord et lol bien associés.');

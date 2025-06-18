@@ -1,7 +1,16 @@
 import {EmbedBuilder } from 'discord.js';
 import axios from 'axios';
 import { getData, updateData } from '../database/bddFunction.js';
-const channelId = process.env.channelid;
+
+// On n'utilise plus channelId en dur, mais on va le chercher dans la table optimisée
+async function getChannelForWriting(guildId) {
+    // On cherche le channel lié à la guild courante
+    const data = await getData('lptracker_channels', { guild_id: guildId });
+    if (data.length > 0) {
+        return data[0].channel_id;
+    }
+    return null;
+}
 
 
 //tableau avec toutes les valeurs que j'ai besoins pour le message 
@@ -28,7 +37,12 @@ async function trackingLp(client, riotKey) {
                 await getPlayerRankAndLp(item.id,riotKey,item.lp,item.tier, item.rank, m_data);
                 await updateLastGameID(item.puuid, m_data.gameID, m_data.lpGeneral, m_data.rank, m_data.tier);
                 
-                await scheduleMessage(client, m_data);
+                 // On va chercher le bon channel pour la guild (si besoin, adapte pour multi-guild)
+                // Ici, on suppose que tu as une seule guild ou que tu veux envoyer dans tous les channels configurés
+                const allChannels = await getData('lptracker_channels');
+                for (const channelRow of allChannels) {
+                    await scheduleMessage(client, m_data, channelRow.channel_id);
+                }
             }
             await sleep(interval); // Pause entre chaque élément
         }
@@ -121,11 +135,6 @@ async function getPlayerLastSoloDuo(riotKey, puuid,lastGameID, m_data){
    
 }
 
-//permet de savoir le channel ou le bot va devoir écrire les messages 
-async function getChannelForWriting(){
-    let data = await getData('lptrackerchannel', {id : 1});
-    return Number(data[0].idchannel);
-}
 
 //mise en forme du message 
 function createGameResultsEmbed(m_data){
@@ -163,9 +172,8 @@ function createGameResultsEmbed(m_data){
 }
 
 // Fonction pour envoyer un message programmé
-async function scheduleMessage(client, m_data) {
+async function scheduleMessage(client, m_data, channelId) {
         try {
-            //const channelId = await getChannelForWriting();
             const channel = await client.channels.fetch(channelId);
             if (channel /*&& channel.isTextBased()*/) {
                 await channel.send({embeds : [createGameResultsEmbed(m_data)] });
@@ -183,7 +191,7 @@ function sleep(ms) {
 
 async function updateLastGameID(puuid, newGameID, newLp, newRank, newTier) {
     try {
-        await updateData('enregistredpersons', {lastgameid : newGameID, lp : newLp, rank : newRank, tier : newTier}, {puuid : puuid})
+        await updateData('lol_accounts', {last_game_id : newGameID, lp : newLp, rank : newRank, tier : newTier}, {puuid : puuid})
     } catch (error) {
         console.error('Erreur dans updateLastGameId : ', error);
     }

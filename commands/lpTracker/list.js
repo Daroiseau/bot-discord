@@ -7,8 +7,9 @@ export default {
         .setDescription('Permet d\'afficher les comptes enregistré'),
     async execute(interaction) {
         try {
-            const data = await getData('enregistredpersons');
-            await interaction.reply({embeds : [await createGameResultsEmbed(data)] })
+            const accounts = await getData('lol_accounts');
+            const users = await getData('discord_users');
+            await interaction.reply({embeds : [await createGameResultsEmbed(accounts, users)] })
         }catch(error){
             console.error("problème avec le leaderboard", error);
             await interaction.reply({
@@ -19,7 +20,7 @@ export default {
     }
 };
 
-async function createGameResultsEmbed(leaderboard){
+async function createGameResultsEmbed(accounts, users) {
     const embed = new EmbedBuilder()
     .setAuthor({
         name : `Leaderboard Solo/Duo queue`,
@@ -28,10 +29,12 @@ async function createGameResultsEmbed(leaderboard){
     .setTitle('list tracked accounts')
     .setColor('#9300f5'); // Couleur de l'embed
     let iterator = 0;
-    for (const personne of leaderboard) {
+    for (const personne of accounts) {
+        const user = users.find(u => u.id === personne.discord_user_id);
+        const discordName = user ? user.discord_name : 'Unknown User';
         embed.addFields({ 
-            name :`${personne.gamename}#${personne.tag}`,
-            value: ' ', 
+            name :`${personne.game_name}#${personne.tag}`,
+            value: `Discord: ${discordName}`,
             inline: false 
         });
     }

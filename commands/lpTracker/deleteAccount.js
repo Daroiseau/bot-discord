@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from 'discord.js';
-import { deleteData } from '../../database/bddFunction.js';
+import { deleteData, getData } from '../../database/bddFunction.js';
 
 export default {
     data: new SlashCommandBuilder()
@@ -17,8 +17,27 @@ export default {
     async execute(interaction) {
         const pseudo = interaction.options.getString('pseudo');
         const tag = interaction.options.getString('tag');
+        const discordId = interaction.user.id;
+
         try{
-            const res = await deleteData('lol_accounts',{game_name : pseudo, tag : tag});
+            //1 Récupérer l'id interne de l'utilisateur discord
+            const users = await getData('discord_users', { discord_id: discordId });
+            if(users.length === 0) {
+                await interaction.reply({
+                    content: "Vous devez d'abord vous enregistrer avec la commande /register.",
+                    ephemeral: true // Only the user who invoked the command will see this message
+                });
+                return;
+            }
+            const discordUserId = users[0].id;
+
+            //2 Supprimer le compte lol lié à ce discord user
+            const res = await deleteData('lol_accounts',{
+                discord_user_id : discordUserId,
+                game_name : pseudo,
+                tag : tag
+            });
+
             if(res != 0){
                 await interaction.reply("Le compte a bien été supprimé");
             }else{
