@@ -33,7 +33,7 @@ async function trackingLp(client, riotKey) {
             //item.id = summonner id;
             const played = await getPlayerLastSoloDuo(riotKey,item.puuid,item.lastgameid, m_data);
             if(played){
-                m_data.pseudo = item.gamename + '#'+ item.tag;
+                m_data.pseudo = item.game_name + '#'+ item.tag;
                 await getPlayerRankAndLp(item.id,riotKey,item.lp,item.tier, item.rank, m_data);
                 await updateLastGameID(item.puuid, m_data.gameID, m_data.lpGeneral, m_data.rank, m_data.tier);
                 
@@ -191,10 +191,14 @@ function sleep(ms) {
 
 async function updateLastGameID(puuid, newGameID, newLp, newRank, newTier) {
     try {
-        await updateData('lol_accounts', {last_game_id : newGameID, lp : newLp, rank : newRank, tier : newTier}, {puuid : puuid})
+        await updateData('lol_accounts', {last_game_id : newGameID, lp : safeInt(newLp), rank : newRank, tier : newTier}, {puuid : puuid})
     } catch (error) {
         console.error('Erreur dans updateLastGameId : ', error);
     }
+}
+
+function safeInt(val) {
+    return (val === '' || val === undefined || val === null) ? null : Number(val);
 }
 
 export default trackingLp ;
