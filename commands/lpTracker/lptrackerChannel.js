@@ -4,7 +4,8 @@ import { updateData, insertData, getData } from '../../database/bddFunction.js';
 export default {
     data: new SlashCommandBuilder()
         .setName('createrankchannel')
-        .setDescription('Permet de définir le channel où vont être affichées les informations des games classées des comptes enregistrés')
+        .setDescription('Permet de définir le channel où vont être affichées les informations des games classées des comptes')
+        .setDescription('enregistrés')
         .addStringOption(option =>
             option.setName('rankchannel')
                 .setDescription('ID du salon où vont être affichées les informations')
