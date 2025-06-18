@@ -49,14 +49,14 @@ export default {
         try {
             // Vérification si le pseudo discord est valide
             // 1 Vérifier ou insérer l'utilisateur discord 
-            let users = await getData('discord_users', { discord_id: discord_id });
+            let users = await getData('discord_users', { discord_id: discordId });
             let discordUserId;
             if(users.length === 0) {
                 await insertData('discord_users', { 
                     discord_id: discordId, 
                     discord_name: discordName 
                 });
-                users = await getData('discord_users', { discord_id: discord_id });
+                users = await getData('discord_users', { discord_id: discordId });
             }
             discordUserId = users[0].id;
 
