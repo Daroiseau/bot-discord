@@ -1,12 +1,12 @@
-const { SlashCommandBuilder } = require('discord.js');
-const axios = require('axios');
-require(`dotenv`).config();
-const {EmbedBuilder } = require('discord.js');
+import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
+import axios from 'axios';
+import dotenv from 'dotenv';
+dotenv.config();
 const  riotAPIKey  = process.env.riotAPIKey;
 
 
 
-module.exports = {
+export default {
     data: new SlashCommandBuilder()
         .setName('playerinfo')
         .setDescription('Get info of a player')
@@ -23,14 +23,46 @@ module.exports = {
     async execute(interaction) {
         const summonerName = interaction.options.getString('playername');
         const summonerTag = interaction.options.getString('tag');
-        const summonerInfo = await getSummonerInfo(summonerName, summonerTag);
+        try {
+            const summonerInfo = await getSummonerInfo(summonerName, summonerTag);
 
-        if (summonerInfo) {
-            const rankInfo = await getRankedInfo(summonerInfo.puuid);
+            if (!summonerInfo) {
+                await interaction.reply('Impossible de trouver ce joueur.');
+                return;
+            }
+
             const OtherSumInfo = await getOtherSummonerInfo(summonerInfo.puuid);
-            await interaction.reply({embeds : [createGameResultsEmbed(rankInfo, OtherSumInfo, summonerInfo)] })
-        } else {
-            await interaction.reply('Impossible de trouver ce joueur.');
+
+            if (!OtherSumInfo) {
+                await interaction.reply('Impossible de trouver les informations supplémentaires pour ce joueur.');
+                return;
+            }
+
+            const rankInfo = await getRankedInfo(summonerInfo.puuid);
+
+            if (!rankInfo) {
+                await interaction.reply('Impossible de trouver les informations de classement pour ce joueur.');
+                return;
+            }
+            
+            await interaction.reply({
+                embeds : [createGameResultsEmbed(rankInfo, OtherSumInfo, summonerInfo)] 
+            });
+ 
+        }catch (error) {
+           console.error('Erreur dans playerinfo:', error);
+            if (interaction.replied || interaction.deferred) {
+                await interaction.followUp({
+                    content: 'Une erreur est survenue lors de la récupération des informations du joueur (1).',
+                    ephemeral: true
+                });
+            } else {
+                await interaction.reply({
+                    content: 'Une erreur est survenue lors de la récupération des informations du joueur (2).',
+                    ephemeral: true
+                });
+        
+           }
         }
     }
 };

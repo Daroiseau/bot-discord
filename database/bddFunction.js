@@ -1,4 +1,4 @@
-const pool = require('./bd.js');
+import pool from './bd.js';
 
 
 /**
@@ -8,7 +8,7 @@ const pool = require('./bd.js');
  * @param {object} data - Les données à insérer sous forme d'objet { colonne: valeur }.
  * @returns {Promise} - Une promesse qui se résout une fois l'insertion effectuée.
  */
-async function insertData(tableName, data) {
+export async function insertData(tableName, data) {
     try {
       const keys = Object.keys(data);
       const values = Object.values(data);
@@ -33,7 +33,7 @@ async function insertData(tableName, data) {
  * @param {object} criteria - Les critères de suppression sous forme d'objet { colonne: valeur }.
  * @returns {Promise} - Une promesse qui se résout une fois la suppression effectuée.
  */
-async function deleteData(tableName, criteria) {
+export async function deleteData(tableName, criteria) {
     try {
       const keys = Object.keys(criteria);
       const values = Object.values(criteria);
@@ -62,7 +62,7 @@ async function deleteData(tableName, criteria) {
  * @param {object} [criteria] - (Facultatif) Les critères de récupération sous forme d'objet { colonne: valeur }.
  * @returns {Promise} - Une promesse qui se résout avec les données récupérées.
  */
-async function getData(tableName, criteria = {}) {
+export async function getData(tableName, criteria = {}) {
     try {
       const keys = Object.keys(criteria);
       const values = Object.values(criteria);
@@ -91,7 +91,7 @@ async function getData(tableName, criteria = {}) {
  * @param {object} [criteria] - (Facultatif) Les critères de récupération sous forme d'objet { colonne: valeur }.
  * @returns {Promise} - Une promesse qui se résout avec les données récupérées.
  */
-  async function updateData(table, updates, criteria) {
+  export async function updateData(table, updates, criteria) {
     // Construction de la chaîne de colonnes à mettre à jour
     const updateFields = Object.keys(updates)
       .map((key, index) => `${key} = $${index + 1}`)
@@ -122,13 +122,13 @@ async function getData(tableName, criteria = {}) {
     }
   }
 
-  async function upsertData(table, data, conflictColumn) {
+  export async function upsertData(table, data, conflictColumn) {
     const columns = Object.keys(data);
     const values = Object.values(data);
     const placeholders = columns.map((_, index) => `$${index + 1}`).join(', ');
   
     const updateClause = columns
-      .map((col, index) => `${col} = $${index + 1}`)
+      .map((col, index) => `${col} = $${index + 1 + columns.length}`)
       .join(', ');
   
     const query = `
@@ -139,19 +139,11 @@ async function getData(tableName, criteria = {}) {
     `;
   
     try {
-      await pool.query(query, values);
+      //await pool.query(query, values);
+      await pool.query(query, [...values, ...values]);
       console.log('Données insérées ou mises à jour avec succès.');
     } catch (err) {
       console.error('Erreur lors de l\'insertion ou de la mise à jour :', err);
       //throw err;
     }
   }
-
-
-  module.exports = {
-    insertData,
-    deleteData,
-    getData,
-    updateData,
-    upsertData
-  };

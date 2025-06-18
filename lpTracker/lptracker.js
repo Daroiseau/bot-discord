@@ -1,11 +1,17 @@
-const {EmbedBuilder } = require('discord.js');
-const axios = require('axios');
-const { getData, updateData } = require('../database/bddFunction');
+import {EmbedBuilder } from 'discord.js';
+import axios from 'axios';
+import { getData, updateData } from '../database/bddFunction.js';
 const channelId = process.env.channelid;
 
 
 //tableau avec toutes les valeurs que j'ai besoins pour le message 
-const m_data = {pseudo :'', gameStatue :'', lp : '', lpGeneral :'', tier :'', rank :'', color :'', kills :'', deaths :'', assists :'', champion :'', queue :'', wins :'', losses :'', gameID :'', win :"", promotion:""};
+function createMData(){
+    return {
+        pseudo :'', gameStatue :'', lp : '', lpGeneral :'', tier :'', rank :'', color :'', 
+        kills :'', deaths :'', assists :'', champion :'', queue :'', wins :'', losses :'', 
+        gameID :'', win :"", promotion:""
+    };
+}
 
 async function trackingLp(client, riotKey) {
     const interval = 10000; // Intervalle en millisecondes (10 secondes)
@@ -13,28 +19,29 @@ async function trackingLp(client, riotKey) {
     console.log("vérification des dernières games jouées par les personnes inscrites");
 
         for (const item of Data) {
+            const m_data = createMData();
 
             //item.id = summonner id;
-            const played = await getPlayerLastSoloDuo(riotKey,item.puuid,item.lastgameid);
+            const played = await getPlayerLastSoloDuo(riotKey,item.puuid,item.lastgameid, m_data);
             if(played){
                 m_data.pseudo = item.gamename + '#'+ item.tag;
-                await getPlayerRankAndLp(item.id,riotKey,item.lp,item.tier, item.rank);
+                await getPlayerRankAndLp(item.id,riotKey,item.lp,item.tier, item.rank, m_data);
                 await updateLastGameID(item.puuid, m_data.gameID, m_data.lpGeneral, m_data.rank, m_data.tier);
                 
-                await scheduleMessage(client);
+                await scheduleMessage(client, m_data);
             }
             await sleep(interval); // Pause entre chaque élément
         }
 
         // Re-lancer après avoir traité tous les éléments relancer toutes les 10 mins (600000)
         console.log("fin de la vérification");
-        setTimeout(() => trackingLp(client, riotKey), 600000);}
-
+        setTimeout(() => trackingLp(client, riotKey), 600000);
+}
 
 
 
 // Fonction principale pour afficher le rang et les LP
-async function getPlayerRankAndLp(summonerId,riotKey, lastLp, lastTier, lastRank ) {
+async function getPlayerRankAndLp(summonerId,riotKey, lastLp, lastTier, lastRank, m_data ) {
     
     try {
         const url = `https://euw1.api.riotgames.com/lol/league/v4/entries/by-summoner/${summonerId}?api_key=${riotKey}`;
@@ -79,7 +86,7 @@ async function getPlayerRankAndLp(summonerId,riotKey, lastLp, lastTier, lastRank
     }
 }
 
-async function getPlayerLastSoloDuo(riotKey, puuid,lastGameID){
+async function getPlayerLastSoloDuo(riotKey, puuid,lastGameID, m_data){
     //récupérer les dernières parties 
     try {
         const responses = await axios.get(`https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/${puuid}/ids?type=ranked&start=0&count=1&api_key=${riotKey}`);
@@ -156,7 +163,7 @@ function createGameResultsEmbed(m_data){
 }
 
 // Fonction pour envoyer un message programmé
-async function scheduleMessage(client) {
+async function scheduleMessage(client, m_data) {
         try {
             //const channelId = await getChannelForWriting();
             const channel = await client.channels.fetch(channelId);
@@ -182,4 +189,4 @@ async function updateLastGameID(puuid, newGameID, newLp, newRank, newTier) {
     }
 }
 
-module.exports = { trackingLp };
+export default trackingLp ;

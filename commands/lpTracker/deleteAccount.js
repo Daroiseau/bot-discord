@@ -1,7 +1,7 @@
-const { SlashCommandBuilder } = require('discord.js');
-const { deleteData } = require('../../database/bddFunction');
+import { SlashCommandBuilder } from 'discord.js';
+import { deleteData } from '../../database/bddFunction.js';
 
-module.exports = {
+export default {
     data: new SlashCommandBuilder()
         .setName('deleteaccount')
         .setDescription('Permet de supprimer un compte enregistré')
@@ -26,6 +26,10 @@ module.exports = {
             }
         }catch(err){
             console.error('Error in deleteaccount : ',err);
+            await interaction.reply({
+                content : "Une erreur est survenue lors de la suppression du compte.",
+                ephemeral: true // Only the user who invoked the command will see this message
+            });
         }
     }
 };

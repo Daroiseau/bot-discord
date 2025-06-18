@@ -1,12 +1,27 @@
-const { SlashCommandBuilder } = require('discord.js');
-const axios = require('axios');
-require(`dotenv`).config();
+import { SlashCommandBuilder } from 'discord.js';
+import axios from 'axios';
+import dotenv from 'dotenv';
+dotenv.config();
+import { insertData } from '../../database/bddFunction.js';
 const  riotAPIKey  = process.env.riotAPIKey;
-const { insertData } = require('../../database/bddFunction');
-const m_data = {discordname : '', gamename :'', tag :'', puuid : '', id :'', accountid : '', profileiconid : '', revisiondate : '', summonerlevel :'', lastgameid : '', lp :'', rank:'', tier :''};
+const m_data = {
+    discordname : '', 
+    gamename :'', 
+    tag :'', 
+    puuid : '', 
+    id :'', 
+    accountid : '', 
+    profileiconid : '', 
+    revisiondate : '', 
+    summonerlevel :'', 
+    lastgameid : '', 
+    lp :'', 
+    rank:'', 
+    tier :''
+};
 
 
-module.exports = {
+export default {
     data: new SlashCommandBuilder()
         .setName('register')
         .setDescription('register a player with a discord account, it works one time')
@@ -29,46 +44,57 @@ module.exports = {
         const summonerName = interaction.options.getString('playername');
         const summonerTag = interaction.options.getString('tag');
         m_data.discordname = interaction.options.getString('discordaccount');
-        const summonerInfo = await getSummonerInfo(summonerName, summonerTag);
 
-        if (summonerInfo) {
+        try {
+            // Vérification si le pseudo discord est valide
+            const summonerInfo = await getSummonerInfo(summonerName, summonerTag);
+
+            if (!summonerInfo) {
+                await interaction.reply('Impossible de trouver ce joueur.');
+                return;
+            }
+
             m_data.gamename = summonerInfo.gameName;
             m_data.tag = summonerInfo.tagLine;
             m_data.puuid = summonerInfo.puuid;
+
             const summonerOtherInfo = await getOtherSummonerInfo(m_data.puuid);
 
-            if(summonerOtherInfo){
-                m_data.id = summonerOtherInfo.id;
-                m_data.accountid = summonerOtherInfo.accountId;
-                m_data.profileiconid = summonerOtherInfo.profileIconId;
-                m_data.revisiondate = summonerOtherInfo.revisionDate;
-                m_data.summonerlevel = summonerOtherInfo.summonerLevel;
-                await getPlayerRankAndLp(m_data.id);
-                await getLastGameID(m_data.puuid);
-                try {
-                    // Sauvegarde des données dans un fichier JSON
-                    const res = await insertData('enregistredpersons',m_data);
-                    if(res !== undefined){
-                        await interaction.reply('Compte discord et lol bien associés.');
-                    }else{
-                        await interaction.reply('Compte discord et lol déjà associés.');
-                    }
-                    
-                } catch (error) {
-                    console.error('Erreur dans registerDiscordLol:', error);
-                    await interaction.reply('Compte discord et lol déjà associés');
-                }
+            if(!summonerOtherInfo){
+                await interaction.reply('Impossible de trouver ce joueur.');
+                return;
             }
-        } else {
-            await interaction.reply('Impossible de trouver ce joueur.');
+
+            m_data.id = summonerOtherInfo.id;
+            m_data.accountid = summonerOtherInfo.accountId;
+            m_data.profileiconid = summonerOtherInfo.profileIconId;
+            m_data.revisiondate = summonerOtherInfo.revisionDate;
+            m_data.summonerlevel = summonerOtherInfo.summonerLevel;
+
+            await getPlayerRankAndLp(m_data.id);
+            await getLastGameID(m_data.puuid);
+
+            const res = await insertData('enregistredpersons', m_data);
+            
+            if (res > 0) {
+                await interaction.reply('Compte discord et lol bien associés.');
+            } else {
+                // Si l'insertion échoue, cela signifie que le compte est déjà associé
+                await interaction.reply('Compte discord et lol déjà associés.');
+            }
+        } catch (error) {
+            console.error('Erreur dans registerDiscordLol:', error);
+            await interaction.reply({
+                content : 'Une erreur est survenue lors de l\'association du compte.',
+                ephemeral : true
+            });
         }
     }
 };
 
 async function getSummonerInfo(summonerName, tag) {
     try {
-        const response = await axios.get(`https://europe.api.riotgames.com/riot/account/v1/accounts/by-riot-id/${summonerName}/${tag}?api_key=${riotAPIKey}`
-        );
+        const response = await axios.get(`https://europe.api.riotgames.com/riot/account/v1/accounts/by-riot-id/${summonerName}/${tag}?api_key=${riotAPIKey}`);
         return response.data;
     } catch (error) {
         console.error('Erreur lors de l\'appel à l\'API Riot dans la fonction getSummonerInfo', error);
@@ -77,8 +103,7 @@ async function getSummonerInfo(summonerName, tag) {
 }
 async function getOtherSummonerInfo(puuid) {
     try {
-        const response = await axios.get(`https://euw1.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/${puuid}?api_key=${riotAPIKey}`
-        );
+        const response = await axios.get(`https://euw1.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/${puuid}?api_key=${riotAPIKey}`);
         return response.data;
     } catch (error) {
         console.error('Erreur lors de l\'appel à l\'API Riot dans la fonction getSummonerOtherInfo', error);
@@ -114,7 +139,7 @@ async function getLastGameID(puuid){
     try {
         const responses = await axios.get(`https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/${puuid}/ids?type=ranked&start=0&count=1&api_key=${riotAPIKey}`);
         const gameIDs = responses.data;
-        if(!Array.isArray(gameIDs) || !(gameIDs.length > 0)){
+        if(!Array.isArray(gameIDs) || gameIDs.length === 0){
             m_data.lastgameid = "";
             return;
         }

@@ -1,8 +1,7 @@
-const { SlashCommandBuilder } = require('discord.js');
-const {EmbedBuilder } = require('discord.js');
-const { getData } = require('../../database/bddFunction');
+import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
+import { getData } from '../../database/bddFunction.js';
 
-module.exports = {
+export default {
     data: new SlashCommandBuilder()
         .setName('list')
         .setDescription('Permet d\'afficher les comptes enregistré'),
@@ -12,6 +11,10 @@ module.exports = {
             await interaction.reply({embeds : [await createGameResultsEmbed(data)] })
         }catch(error){
             console.error("problème avec le leaderboard", error);
+            await interaction.reply({
+                content: 'Une erreur est survenue lors de la récupération des informations du joueur.',
+                ephemeral: true
+            });
         }
     }
 };

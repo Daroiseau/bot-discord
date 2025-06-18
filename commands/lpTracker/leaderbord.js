@@ -1,6 +1,5 @@
-const { SlashCommandBuilder } = require('discord.js');
-const {EmbedBuilder } = require('discord.js');
-const { getData } = require('../../database/bddFunction');
+import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
+import { getData } from '../../database/bddFunction.js';
 
 const rankList = ["","IV","III","II","I"];
 const tierList = ["UNRANKED","IRON","BRONZE","SILVER","GOLD","PLATINUM","DIAMOND","MASTER","GRANDMASTER","CHALLENGER"];
@@ -8,7 +7,7 @@ const tierList = ["UNRANKED","IRON","BRONZE","SILVER","GOLD","PLATINUM","DIAMOND
 
 
 
-module.exports = {
+export default {
     data: new SlashCommandBuilder()
         .setName('leaderboard')
         .setDescription('Permet d\'afficher le leaderboard des parties classés des personnes enregistré'),
@@ -20,18 +19,37 @@ module.exports = {
 
         }catch(error){
             console.error("problème avec le leaderboard", error);
+            await interaction.reply({
+                content: "Une erreur est survenue lors de l'affichage du leaderboard.",
+                ephemeral: true
+            });
         }
     }
 };
 
 async function compare(data){
-    const leaderboard = [{}];
+    const leaderboard = [];
     for (const item of data) {
-        const point = `${tierList.indexOf(item.tier)}`+`${rankList.indexOf(item.rank)}`;
-        leaderboard.push({name : item.gamename,point : point, tier : item.tier, rank :item.rank, lp : item.lp });
+        const tierIndex = tierList.indexOf(item.tier);
+        const rankIndex = rankList.indexOf(item.rank);
+        if (tierIndex === -1 || rankIndex === -1) {
+            console.error(`Invalid tier or rank for player ${item.gamename}: tier=${item.tier}, rank=${item.rank}`);
+            continue; // Skip this item if tier or rank is invalid
+        }
+        // Calculate the point based on tier and rank
+        // Assuming the point is calculated as tier * 4 + rank, where tier is from 0 to 9 and rank is from 0 to 4
+        // Example: UNRANKED = 0, IRON IV = 1, IRON III = 2, ..., CHALLENGER I = 36
+        const point = (tierIndex * 4) + rankIndex;
+        // Add the player to the leaderboard with their calculated points`;
+        leaderboard.push({
+            name : item.gamename,
+            point : point,
+            tier : item.tier,
+            rank : item.rank,
+            lp : item.lp
+        });
     }
-    leaderboard.sort((a, b) =>  b.point - a.point);
-    leaderboard.splice(0,1);
+    leaderboard.sort((a, b) =>  b.point - a.point); // Sort the leaderboard in descending order based on points
     return leaderboard;
 }
 

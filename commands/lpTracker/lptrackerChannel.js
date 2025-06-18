@@ -1,9 +1,9 @@
-const { SlashCommandBuilder } = require('discord.js');
-const { updateData } = require('../../database/bddFunction');
+import { SlashCommandBuilder } from 'discord.js';
+import { updateData } from '../../database/bddFunction.js';
 
 
 
-module.exports = {
+export default {
     data: new SlashCommandBuilder()
         .setName('createrankchannel')
         .setDescription('Permet de définir le channel où vont être affiché les informations des games classés')
@@ -14,7 +14,7 @@ module.exports = {
                 .setRequired(true)
         ),
     async execute(interaction) {
-        const channelName = interaction.options.getAny('rankchannel');
+        const channelName = interaction.options.getString('rankchannel');
         try {
             const res = await updateData('lptrackerchannel',{idchannel : channelName}, {id : 1});
             if(res != 0){
@@ -24,8 +24,10 @@ module.exports = {
             }
         }catch{
             console.error(`Erreur dans lpTrackerChannel:`, error);
-            throw error; // Rejette l'erreur pour pouvoir la gérer dans l'exécution de la commande
-
+            await interaction.reply({
+                content: "Une erreur est survenue lors de la création du channel.",
+                ephemeral: true // Only the user who invoked the command will see this message
+            });
         }
     }
 };
