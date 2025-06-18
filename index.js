@@ -9,7 +9,7 @@ import { pathToFileURL } from 'node:url';
 dotenv.config();
 
 
-const tokenDiscord  = process.env.tokenDiscord;
+const tokenDiscord  = process.env.tokenDiscordPrinc;
 const  riotAPIKey  = process.env.riotAPIKey;
 
 // Port par défaut fourni par Render

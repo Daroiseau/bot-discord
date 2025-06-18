@@ -4,10 +4,10 @@ dotenv.config();
 import fs from 'node:fs';
 import path from 'node:path';
 
-const  tokenDiscord = process.env.tokenDiscord;
+const  tokenDiscord = process.env.tokenDiscordPrinc;
 const  riotAPIKey  = process.env.riotAPIKey;
-const  clientId  = process.env.clientId;
-const  guildId  = process.env.guildId;
+const  clientId  = process.env.clientIdPrinc;
+const  guildId  = process.env.guildIdPrinc;
 
 const commands = [];
 const __dirname = path.resolve();
