@@ -13,7 +13,7 @@ export default {
         .setDescription('Permet d\'afficher le leaderboard des parties classés des personnes enregistré'),
     async execute(interaction) {
         try {
-            const data = await getData('enregistredpersons');
+            const data = await getData('lol_accounts');
             const leaderbord = await compare(data);
             await interaction.reply({embeds : [await createGameResultsEmbed(leaderbord)] })
 

@@ -15,7 +15,7 @@ function createMData(){
 
 async function trackingLp(client, riotKey) {
     const interval = 10000; // Intervalle en millisecondes (10 secondes)
-    const Data = await getData('enregistredpersons');
+    const Data = await getData('lol_accounts');
     console.log("vérification des dernières games jouées par les personnes inscrites");
 
         for (const item of Data) {

@@ -18,7 +18,7 @@ export default {
         const pseudo = interaction.options.getString('pseudo');
         const tag = interaction.options.getString('tag');
         try{
-            const res = await deleteData('enregistredpersons',{gameName : pseudo, tag : tag});
+            const res = await deleteData('lol_accounts',{game_name : pseudo, tag : tag});
             if(res != 0){
                 await interaction.reply("Le compte a bien été supprimé");
             }else{
