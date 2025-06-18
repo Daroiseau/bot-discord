@@ -31,7 +31,7 @@ async function trackingLp(client, riotKey) {
             const m_data = createMData();
 
             //item.id = summonner id;
-            const played = await getPlayerLastSoloDuo(riotKey,item.puuid,item.lastgameid, m_data);
+            const played = await getPlayerLastSoloDuo(riotKey,item.puuid,item.last_game_id, m_data);
             if(played){
                 m_data.pseudo = item.game_name + '#'+ item.tag;
                 await getPlayerRankAndLp(item.id,riotKey,item.lp,item.tier, item.rank, m_data);
