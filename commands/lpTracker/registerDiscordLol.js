@@ -132,7 +132,7 @@ async function getSummonerInfo(summonerName, tag) {
 async function getOtherSummonerInfo(puuid) {
     try {
         const response = await axios.get(`https://euw1.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/${puuid}?api_key=${riotAPIKey}`);
-        return response.data;
+        return response.data.find(entry => entry.queueType === "RANKED_SOLO_5x5");
     } catch (error) {
         console.error('Erreur lors de l\'appel à l\'API Riot dans la fonction getSummonerOtherInfo', error);
         return null;
