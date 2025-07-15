@@ -32,7 +32,7 @@ export default {
             const discordUserId = users[0].id;
 
             //2 Supprimer le compte lol lié à ce discord user
-            const res = await deleteData('lol_accounts',{
+            let res = await deleteData('lol_accounts',{
                 discord_user_id : discordUserId,
                 game_name : pseudo,
                 tag : tag
@@ -42,7 +42,7 @@ export default {
                 discord_id : discordUserId
             });
 
-            if(res != 0){
+            if(res === 2){
                 await interaction.reply("Le compte a bien été supprimé");
             }else{
                 await interaction.reply("Le compte n'as pas pu être supprimé, il n'existe pas");
