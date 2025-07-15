@@ -33,7 +33,7 @@ export default {
 
             //2 Supprimer le compte lol lié à ce discord user
             let res = await deleteData('lol_accounts',{
-                discord_user_id : discordId,
+                discord_user_id : discordUserId,
                 game_name : pseudo,
                 tag : tag
             });
