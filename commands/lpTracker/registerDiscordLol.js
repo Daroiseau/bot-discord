@@ -71,7 +71,7 @@ export default {
             m_data.tag = summonerInfo.tagLine;
             m_data.puuid = summonerInfo.puuid;
 
-            const summonerOtherInfo = await getOtherSummonerInfo(m_data.puuid);
+           /* const summonerOtherInfo = await getOtherSummonerInfo(m_data.puuid);
 
             if(!summonerOtherInfo){
                 await interaction.reply('Impossible de trouver ce joueur.');
@@ -82,7 +82,7 @@ export default {
             m_data.accountid = summonerOtherInfo.accountId;
             m_data.profileiconid = summonerOtherInfo.profileIconId;
             m_data.revisiondate = summonerOtherInfo.revisionDate;
-            m_data.summonerlevel = summonerOtherInfo.summonerLevel;
+            m_data.summonerlevel = summonerOtherInfo.summonerLevel;*/
 
             await getPlayerRankAndLp(m_data.puuid);
             await getLastGameID(m_data.puuid);
@@ -94,9 +94,9 @@ export default {
                 tag: m_data.tag,
                 puuid: m_data.puuid,
                 summoner_id: m_data.id,
-                account_id: m_data.accountid,
-                profile_icon_id: m_data.profileiconid,
-                summoner_level: m_data.summonerlevel,
+                //account_id: m_data.accountid,
+                //profile_icon_id: m_data.profileiconid,
+                //summoner_level: m_data.summonerlevel,
                 last_game_id: m_data.lastgameid,
                 lp: m_data.lp,
                 rank: m_data.rank,
@@ -129,7 +129,7 @@ async function getSummonerInfo(summonerName, tag) {
         return null;
     }
 }
-async function getOtherSummonerInfo(puuid) {
+/*async function getOtherSummonerInfo(puuid) {
     try {
         const response = await axios.get(`https://euw1.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/${puuid}?api_key=${riotAPIKey}`);
         return response.data[1];
@@ -137,7 +137,7 @@ async function getOtherSummonerInfo(puuid) {
         console.error('Erreur lors de l\'appel à l\'API Riot dans la fonction getSummonerOtherInfo', error);
         return null;
     }
-}
+}*/
 
 async function getPlayerRankAndLp(puuid) {
     
