@@ -131,8 +131,15 @@ async function getSummonerInfo(summonerName, tag) {
 }
 async function getOtherSummonerInfo(puuid) {
     try {
-        const response = await axios.get(`https://euw1.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/${puuid}?api_key=${riotAPIKey}`);
-        return response.data.find(entry => entry.queueType === "RANKED_SOLO_5x5");
+        const summonerResponse = await axios.get(`https://euw1.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/${puuid}?api_key=${riotAPIKey}`);
+        const summonerData = summonerResponse.data;
+        const summonerId = summonerData.id;
+
+        // Maintenant, récupère les ranks et filtre la solo/duo
+        const leagueResponse = await axios.get(`https://euw1.api.riotgames.com/lol/league/v4/entries/by-summoner/${summonerId}?api_key=${riotAPIKey}`);
+        const soloQueue = leagueResponse.data.find(entry => entry.queueType === "RANKED_SOLO_5x5");
+
+        return soloQueue;
     } catch (error) {
         console.error('Erreur lors de l\'appel à l\'API Riot dans la fonction getSummonerOtherInfo', error);
         return null;
