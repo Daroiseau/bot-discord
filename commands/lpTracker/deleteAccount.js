@@ -38,6 +38,10 @@ export default {
                 tag : tag
             });
 
+            res += await deleteData('discord_users', {
+                discord_id : discordUserId
+            });
+
             if(res != 0){
                 await interaction.reply("Le compte a bien été supprimé");
             }else{
