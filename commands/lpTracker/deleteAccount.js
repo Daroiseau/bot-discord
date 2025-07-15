@@ -38,11 +38,7 @@ export default {
                 tag : tag
             });
 
-            res += await deleteData('discord_users', {
-                discord_id : discordUserId
-            });
-
-            if(res === 2){
+            if(res === 1){
                 await interaction.reply("Le compte a bien été supprimé");
             }else{
                 await interaction.reply("Le compte n'as pas pu être supprimé, il n'existe pas");
