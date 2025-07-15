@@ -34,7 +34,7 @@ async function trackingLp(client, riotKey) {
             const played = await getPlayerLastSoloDuo(riotKey,item.puuid,item.last_game_id, m_data);
             if(played){
                 m_data.pseudo = item.game_name + '#'+ item.tag;
-                await getPlayerRankAndLp(item.id,riotKey,item.lp,item.tier, item.rank, m_data);
+                await getPlayerRankAndLp(item.puuid,riotKey,item.lp,item.tier, item.rank, m_data);
                 await updateLastGameID(item.puuid, m_data.gameID, m_data.lpGeneral, m_data.rank, m_data.tier);
                 await deleteData('lol_matches', {puuid: item.puuid, match_id: m_data.gameID}); // On supprime l'ancienne partie si elle existe
                 await insertData('lol_matches', {
@@ -70,10 +70,10 @@ async function trackingLp(client, riotKey) {
 
 
 // Fonction principale pour afficher le rang et les LP
-async function getPlayerRankAndLp(summonerId,riotKey, lastLp, lastTier, lastRank, m_data ) {
+async function getPlayerRankAndLp(puuid,riotKey, lastLp, lastTier, lastRank, m_data ) {
     
     try {
-        const url = `https://euw1.api.riotgames.com/lol/league/v4/entries/by-summoner/${summonerId}?api_key=${riotKey}`;
+        const url = `https://euw1.api.riotgames.com/lol/league/v4/entries/by-puuid/${puuid}?api_key=${riotKey}`;
         const response = await axios.get(url);
         const leagueEntries = response.data;
 

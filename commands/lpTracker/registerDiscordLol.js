@@ -84,7 +84,7 @@ export default {
             m_data.revisiondate = summonerOtherInfo.revisionDate;
             m_data.summonerlevel = summonerOtherInfo.summonerLevel;
 
-            await getPlayerRankAndLp(m_data.id);
+            await getPlayerRankAndLp(m_data.puuid);
             await getLastGameID(m_data.puuid);
 
             //3 Insérer dans lol_accounts avec la clé étrangère discord_user_id
@@ -104,7 +104,6 @@ export default {
             };
 
             const res = await insertData('lol_accounts', lolAccount);
-            
             if (res > 0) {
                 await interaction.reply('Compte discord et lol bien associés.');
             } else {
@@ -140,10 +139,10 @@ async function getOtherSummonerInfo(puuid) {
     }
 }
 
-async function getPlayerRankAndLp(summonerId) {
+async function getPlayerRankAndLp(puuid) {
     
     try {
-        const url = `https://euw1.api.riotgames.com/lol/league/v4/entries/by-summoner/${summonerId}?api_key=${riotAPIKey}`;
+        const url = `https://euw1.api.riotgames.com/lol/league/v4/entries/by-puuid/${puuid}?api_key=${riotAPIKey}`;
         const response = await axios.get(url);
         const leagueEntries = response.data;
 
