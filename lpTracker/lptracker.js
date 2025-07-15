@@ -1,6 +1,6 @@
 import {EmbedBuilder } from 'discord.js';
 import axios from 'axios';
-import { getData, updateData } from '../database/bddFunction.js';
+import { getData, updateData, insertData, deleteData } from '../database/bddFunction.js';
 
 // On n'utilise plus channelId en dur, mais on va le chercher dans la table optimisée
 async function getChannelForWriting(guildId) {
@@ -36,6 +36,21 @@ async function trackingLp(client, riotKey) {
                 m_data.pseudo = item.game_name + '#'+ item.tag;
                 await getPlayerRankAndLp(item.id,riotKey,item.lp,item.tier, item.rank, m_data);
                 await updateLastGameID(item.puuid, m_data.gameID, m_data.lpGeneral, m_data.rank, m_data.tier);
+                await deleteData('lol_matches', {puuid: item.puuid, match_id: m_data.gameID}); // On supprime l'ancienne partie si elle existe
+                await insertData('lol_matches', {
+                                                puuid: item.puuid,
+                                                match_id: m_data.gameID,
+                                                queue_type: m_data.queue,
+                                                champion: m_data.champion,
+                                                kills: m_data.kills,
+                                                deaths: m_data.deaths,
+                                                assists: m_data.assists,
+                                                win: m_data.gameStatue === 'win',
+                                                lp_change: m_data.lp,
+                                                tier: m_data.tier,
+                                                rank: m_data.rank,
+                                                played_at: new Date()
+                });
                 
                  // On va chercher le bon channel pour la guild (si besoin, adapte pour multi-guild)
                 // Ici, on suppose que tu as une seule guild ou que tu veux envoyer dans tous les channels configurés
