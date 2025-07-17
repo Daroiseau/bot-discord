@@ -73,13 +73,13 @@ async function trackingLp(client, riotKey) {
 async function verifPuuid(summonerName, tag, puuid, riotAPIKey ) {
     try {
         const response = await axios.get(`https://europe.api.riotgames.com/riot/account/v1/accounts/by-riot-id/${summonerName}/${tag}?api_key=${riotAPIKey}`);
-        if(response.data.puuid === puuid){
+        const newPuuid = response.data.puuid;
+        if (newPuuid === puuid) {
             return puuid;
         }
-        await updateData('lol_matches', { puuid: response.data.puuid}, { puuid: puuid });
-        await updateData('lol_accounts', {puuid : response.data.puuid}, {puuid : puuid });
-        
-        return response.data.puuid;
+        await updateData('lol_accounts', { puuid: newPuuid }, { puuid: puuid });
+        await updateData('lol_matches', { puuid: newPuuid }, { puuid: puuid });
+        return newPuuid;
     } catch (error) {
         console.error('Erreur lors de la vérification du PUUID :', error);
         return puuid;
