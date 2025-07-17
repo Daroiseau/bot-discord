@@ -27,7 +27,8 @@ async function trackingLp(client, riotKey) {
     const Data = await getData('lol_accounts');
     console.log("vérification des dernières games jouées par les personnes inscrites");
 
-        for (const item of Data) {
+        for (let item of Data) {
+            item.puuid = await verifPuuid(item.game_name, item.tag, item.puuid, riotKey);
             const m_data = createMData();
 
             //item.id = summonner id;
@@ -68,6 +69,20 @@ async function trackingLp(client, riotKey) {
 }
 
 
+
+async function verifPuuid(summonerName, tag, puuid, riotAPIKey ) {
+    try {
+        const response = await axios.get(`https://europe.api.riotgames.com/riot/account/v1/accounts/by-riot-id/${summonerName}/${tag}?api_key=${riotAPIKey}`);
+        if(response.data.puuid === puuid){
+            return puuid;
+        }
+        updateData('lol_accounts', {puuid : response.data.puuid});
+        return response.data.puuid;
+    } catch (error) {
+        console.error('Erreur lors de la vérification du PUUID :', error);
+        return puuid;
+    }
+}
 
 // Fonction principale pour afficher le rang et les LP
 async function getPlayerRankAndLp(puuid,riotKey, lastLp, lastTier, lastRank, m_data ) {

@@ -1,2 +1,4 @@
 .env
 lpTrackerChannel.json
+informations/
+node_modules/
