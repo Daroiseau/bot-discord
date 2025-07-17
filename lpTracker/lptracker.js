@@ -76,7 +76,7 @@ async function verifPuuid(summonerName, tag, puuid, riotAPIKey ) {
         if(response.data.puuid === puuid){
             return puuid;
         }
-        updateData('lol_accounts', {puuid : response.data.puuid});
+        await updateData('lol_accounts', {puuid : response.data.puuid}, {game_name : summonerName, tag : tag});
         return response.data.puuid;
     } catch (error) {
         console.error('Erreur lors de la vérification du PUUID :', error);
